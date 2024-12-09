@@ -1,0 +1,7 @@
+<h2>Supprimer la demande de critique</h2>
+<p>Êtes-vous sûr de vouloir supprimer cette demande de critique?</p>
+<form method="post">
+    {% csrf_token %}
+    <button type="submit" class="btn btn-danger">Supprimer</button>
+    <a href="{% url 'home' %}">Annuler</a>
+</form>

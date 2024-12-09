@@ -1,5 +1,5 @@
 """
-URL configuration for fotoblog project.
+URL configuration for litrevu project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.1/topics/http/urls/
@@ -16,11 +16,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
+from authentication.views import CustomLoginView, SignupPageView
+from django.contrib.auth.views import LogoutView
+from blog.views import home, ticket_upload
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', LoginView.as_view(template_name='authentication/login.html',
-                               redirect_authenticated_user=True), name='login'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('signup', SignupView.as_views(), name='signup'),
+    path('', CustomLoginView.as_view(template_name='authentication/login.html'
+                                          ,redirect_authenticated_user=True), name='login'),
+    path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
+    path('signup/', SignupPageView.as_view(template_name='authentication/signup.html'), name='signup'),
+    path('home/', home, name='home'),
+    path('create_ticket/', ticket_upload, name='create_ticket'),
+
 ]

@@ -5,4 +5,17 @@
 {% block content %}
     <h1>Bienvenue sur le site !</h1>
     <p>Contenu de la page d'accueil.</p>
+    <a href="{% url 'create_ticket' %}" class="btn btn-primary">Demander une critique</a>
+
+    <h2>Mes tickets</h2>
+    <ul>
+        {% for ticket in tickets %}
+            <li>
+                <strong>{{ ticket.title }}</strong> - {{ ticket.time_created|date:"d M Y H:i" }}
+                <p>{{ ticket.description }}</p>
+            </li>
+        {% empty %}
+            <p>Vous n'avez aucun ticket pour le moment.</p>
+        {% endfor %}
+    </ul>
 {% endblock %}
