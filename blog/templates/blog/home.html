@@ -1,21 +1,54 @@
 {% extends 'base.html' %}
 
-{% block title %}Accueil{% endblock %}
-
 {% block content %}
-    <h1>Bienvenue sur le site !</h1>
-    <p>Contenu de la page d'accueil.</p>
-    <a href="{% url 'create_ticket' %}" class="btn btn-primary">Demander une critique</a>
+    <h1>Bienvenue {{ user.username}} !</h1>
 
-    <h2>Mes tickets</h2>
-    <ul>
-        {% for ticket in tickets %}
-            <li>
-                <strong>{{ ticket.title }}</strong> - {{ ticket.time_created|date:"d M Y H:i" }}
-                <p>{{ ticket.description }}</p>
-            </li>
-        {% empty %}
-            <p>Vous n'avez aucun ticket pour le moment.</p>
-        {% endfor %}
-    </ul>
+    <a href="{% url 'create_ticket' %}" class="btn btn-primary">Demander une critique</a>
+    <a href="{% url 'create_ticket_review' %}" class="btn btn-primary">Publier une critique</a>
+
+    <h2>Vos tickets</h2>
+    {% for item in tickets_with_reviews %}
+        <div class="ticket">
+            <h3>{{ item.ticket.title }}</h3>
+            <p>{{ item.ticket.description }}</p>
+            {% if item.ticket.image %}
+                <img src="{{ item.ticket.image.image.url }}" alt="Image associée au ticket" style="max-width: 200px;">
+            {% endif %}
+
+            <p>Créé le : {{ item.ticket.time_created }}</p>
+            <a href="{% url 'edit_ticket' item.ticket.id %}">Modifier le ticket</a>
+
+            <h4>Critiques associées :</h4>
+            {% if item.reviews %}
+                {% for review in item.reviews %}
+                    <div class="review">
+                        <p><strong>Note :</strong> {{ review.rating }} / 5</p>
+                        <p><strong>Titre :</strong> {{ review.headline }}</p>
+                        <p>{{ review.body }}</p>
+                        <p>Posté le : {{ review.time_created }}</p>
+                        <a href="{% url 'edit_review' review.id %}">Modifier</a>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <p>Aucune critique pour ce ticket.</p>
+                <a href="{% url 'create_review' item.ticket.id %}">Ajouter une critique</a>
+            {% endif %}
+        </div>
+        <hr>
+    {% endfor %}
+
+    <h2>Autres critiques</h2>
+    <p>Critiques publiées directement ou associées à des tickets externes :</p>
+    {% for review in reviews %}
+        <div class="review">
+            <p><strong>Note :</strong> {{ review.rating }} / 5</p>
+            <p><strong>Titre :</strong> {{ review.headline }}</p>
+            <p>{{ review.body }}</p>
+            <p>Posté le : {{ review.time_created }}</p>
+            <a href="{% url 'edit_review' review.id %}">Modifier</a>
+        </div>
+{% empty %}
+    <p>Aucune critique trouvée.</p>
+{% endfor %}
+
 {% endblock %}

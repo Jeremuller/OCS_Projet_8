@@ -18,7 +18,9 @@ from django.contrib import admin
 from django.urls import path
 from authentication.views import CustomLoginView, SignupPageView
 from django.contrib.auth.views import LogoutView
-from blog.views import home, ticket_upload
+from blog.views import home, ticket_upload, edit_ticket, review_upload, edit_review, create_ticket_review
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -28,5 +30,13 @@ urlpatterns = [
     path('signup/', SignupPageView.as_view(template_name='authentication/signup.html'), name='signup'),
     path('home/', home, name='home'),
     path('create_ticket/', ticket_upload, name='create_ticket'),
+    path('ticket/<int:ticket_id>/edit/', edit_ticket, name='edit_ticket'),
+    path('ticket/<int:ticket_id>create_review/', review_upload, name='create_review'),
+    path('review/<int:review_id>/edit/', edit_review, name='edit_review'),
+    path('ticket-review/create', create_ticket_review, name='create_ticket_review')
 
 ]
+if settings.DEBUG:
+    urlpatterns += static(
+        settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+

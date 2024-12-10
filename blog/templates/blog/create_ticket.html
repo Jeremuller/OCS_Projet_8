@@ -1,7 +1,11 @@
-<h2>Demander une critique</h2>
+{% extends 'base.html' %}
+{% block content %}
+<h2>Créer un ticket</h2>
 <form method="post" enctype="multipart/form-data">
     {{ ticket_form.as_p }}
+    {{ photo_form.as_p }}
     {% csrf_token %}
     <button type="submit" class="btn btn-success">Créer</button>
 </form>
 <a href="{% url 'home' %}">Retour à l'accueil</a>
+{% endblock content%}
