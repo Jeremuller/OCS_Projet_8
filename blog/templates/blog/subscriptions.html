@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <h2>Suivre d'autres utilisateurs</h2>
+
+    <!-- Formulaire pour suivre un utilisateur -->
+    <form method="post" action="{% url 'follow_user' %}">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Envoyer</button>
+    </form>
+
+    <!-- Liste des utilisateurs suivis -->
+    <h2>Abonnements</h2>
+    <ul>
+        {% for user in following %}
+            <li>
+                {{ user.username }}
+                <form method="post" action="{% url 'unfollow_user' user.id %}">
+                    {% csrf_token %}
+                    <button type="submit">Se désabonner</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>Vous ne suivez personne.</li>
+        {% endfor %}
+    </ul>
+
+    <!-- Liste des abonnés -->
+    <h2>Abonnés</h2>
+    <ul>
+        {% for user in followers %}
+            <li>{{ user.username }}</li>
+        {% empty %}
+            <li>Personne ne vous suit encore.</li>
+        {% endfor %}
+    </ul>
+{% endblock %}

@@ -18,7 +18,8 @@ from django.contrib import admin
 from django.urls import path
 from authentication.views import CustomLoginView, SignupPageView
 from django.contrib.auth.views import LogoutView
-from blog.views import home, ticket_upload, edit_ticket, review_upload, edit_review, create_ticket_review
+from blog.views import (home, ticket_upload, edit_ticket, review_upload, edit_review, create_ticket_review,
+                        subscriptions, follow_user, unfollow_user)
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -33,7 +34,10 @@ urlpatterns = [
     path('ticket/<int:ticket_id>/edit/', edit_ticket, name='edit_ticket'),
     path('ticket/<int:ticket_id>create_review/', review_upload, name='create_review'),
     path('review/<int:review_id>/edit/', edit_review, name='edit_review'),
-    path('ticket-review/create', create_ticket_review, name='create_ticket_review')
+    path('ticket-review/create', create_ticket_review, name='create_ticket_review'),
+    path('subscriptions/', subscriptions, name='subscriptions'),
+    path('follow/', follow_user, name='follow_user'),
+    path('unfollow/<int:user_id>/', unfollow_user, name='unfollow_user'),
 
 ]
 if settings.DEBUG:

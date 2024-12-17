@@ -3,6 +3,8 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Ticket, Review
 from . import forms
+from authentication.forms import FollowUsersForm
+from authentication.models import User
 
 
 @login_required
@@ -161,3 +163,55 @@ def create_ticket_review(request):
         'review_form': review_form,
     }
     return render(request, 'blog/create_ticket_review.html', context=context)
+
+
+@login_required
+def follow_user(request):
+    form = FollowUsersForm(request.POST, request_user=request.user)
+
+    if request.method == 'POST':
+        if form.is_valid():
+            user_to_follow = form.cleaned_data['username']
+            request.user.follows.add(user_to_follow)
+            messages.success(request, f"Vous suivez maintenant {user_to_follow}.")
+            return redirect('subscriptions')
+        else:
+            form = FollowUsersForm(request_user=request.user)
+
+    context = {
+        'form': form,
+        'followed_users': request.user.follows.all(),
+        'followers': request.user.followers.all(),
+    }
+    return render(request, 'blog/subscriptions.html', context)
+
+
+@login_required
+def unfollow_user(request, user_id):
+    user_to_unfollow = User.objects.get(id=user_id)
+
+    if user_to_unfollow in request.user.follows.all():
+        request.user.follows.remove(user_to_unfollow)
+        messages.success(request, f"Vous ne suivez plus {user_to_unfollow}.")
+    else:
+        messages.warning(request, "Cet utilisateur n'est pas dans votre liste d'abonnements.")
+
+    return redirect('subscriptions')
+
+
+@login_required
+def subscriptions(request):
+    following = request.user.follows.all()
+    followers = request.user.followers.all()
+    form = FollowUsersForm(request.POST, request_user=request.user)
+
+    print("Following:", following)
+    print("Followers:", followers)
+
+    context = {
+        'following': following,
+        'followers': followers,
+        'form': form
+    }
+
+    return render(request, 'blog/subscriptions.html', context)

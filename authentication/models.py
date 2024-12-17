@@ -4,7 +4,12 @@ from django.db import models
 
 
 class User(AbstractUser):
-    pass
+    follows = models.ManyToManyField(
+        'self',
+        symmetrical=False,
+        verbose_name='suit',
+        related_name='followers',
+    )
 
 
 class UserFollows(models.Model):
