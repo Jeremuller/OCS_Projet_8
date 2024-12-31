@@ -7,7 +7,7 @@ class TicketForm(forms.ModelForm):
 
     class Meta:
         model = models.Ticket
-        fields = ['title', 'description']
+        fields = ['title', 'author', 'description']
 
 
 class DeleteTicketForm(forms.Form):
@@ -20,6 +20,12 @@ class ReviewForm(forms.ModelForm):
     class Meta:
         model = models.Review
         fields = ['rating', 'headline', 'body']
+
+    rating = forms.ChoiceField(
+        choices=[(i, str(i)) for i in range(6)],
+        widget=forms.RadioSelect,
+        label="Note",
+    )
 
 
 class DeleteReviewForm(forms.Form):

@@ -19,14 +19,13 @@ from django.urls import path
 from authentication.views import CustomLoginView, SignupPageView
 from django.contrib.auth.views import LogoutView
 from blog.views import (home, ticket_upload, edit_ticket, review_upload, edit_review, create_ticket_review,
-                        subscriptions, follow_user, unfollow_user)
+                        subscriptions, follow_user, unfollow_user, user_posts)
 from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', CustomLoginView.as_view(template_name='authentication/login.html'
-                                          ,redirect_authenticated_user=True), name='login'),
+    path('', CustomLoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(next_page='login'), name='logout'),
     path('signup/', SignupPageView.as_view(template_name='authentication/signup.html'), name='signup'),
     path('home/', home, name='home'),
@@ -38,6 +37,7 @@ urlpatterns = [
     path('subscriptions/', subscriptions, name='subscriptions'),
     path('follow/', follow_user, name='follow_user'),
     path('unfollow/<int:user_id>/', unfollow_user, name='unfollow_user'),
+    path('posts', user_posts, name='user_posts'),
 
 ]
 if settings.DEBUG:

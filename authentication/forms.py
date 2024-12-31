@@ -1,4 +1,4 @@
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from authentication.models import User
 from django import forms
 
@@ -7,6 +7,21 @@ class SignupForm(UserCreationForm):
     class Meta:
         model = User
         fields = ('username', 'password1', 'password2')
+
+
+class CustomAuthenticationForm(AuthenticationForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({
+            'placeholder': "Nom d'utilisateur",
+            'autocomplete': 'off',
+            'class': 'form-control w-90',
+        })
+        self.fields['password'].widget.attrs.update({
+            'placeholder': "Mot de passe",
+            'autocomplete': 'off',
+            'class': 'form-control w-90',
+        })
 
 
 class FollowUsersForm(forms.Form):

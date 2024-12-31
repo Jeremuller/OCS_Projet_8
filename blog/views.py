@@ -5,25 +5,66 @@ from .models import Ticket, Review
 from . import forms
 from authentication.forms import FollowUsersForm
 from authentication.models import User
+from itertools import chain
+from django.db.models import Q
 
 
 @login_required
 def home(request):
-    tickets = Ticket.objects.filter(user=request.user)
-    reviews = Review.objects.filter(user=request.user)
-    tickets_with_reviews = []
 
-    for ticket in tickets:
-        ticket_reviews = Review.objects.filter(ticket=ticket)
-        tickets_with_reviews.append({
-            'ticket': ticket,
-            'reviews': ticket_reviews,
-        })
-    context = {
-        'tickets_with_reviews': tickets_with_reviews,
-        'reviews': reviews,
-    }
+    user = request.user
+
+    viewable_tickets = Ticket.objects.filter(
+        Q(user=user) | Q(user__in=user.follows.all())
+    ).select_related('image')
+
+    viewable_reviews = Review.objects.filter(
+        Q(user=user) | Q(ticket__user=user) | Q(ticket__user__in=user.follows.all())
+    ).select_related('ticket__image')
+
+    tickets = [{'type': 'ticket', 'ticket': ticket} for ticket in viewable_tickets]
+    reviews = [
+        {'type': 'review', 'review': review, 'ticket': review.ticket}
+        for review in viewable_reviews
+    ]
+
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post['review'].time_created if post['type'] == 'review' else post['ticket'].time_created,
+        reverse=True
+    )
+
+    context = {'posts': posts}
+
+    print(context)
+
     return render(request, 'blog/home.html', context)
+
+
+@login_required
+def user_posts(request):
+
+    user_tickets = request.user.ticket_set.all().select_related('image')
+
+    user_reviews = request.user.review_set.select_related('ticket__image')
+
+    tickets = [{'type': 'ticket', 'ticket': ticket} for ticket in user_tickets]
+    reviews = [
+        {'type': 'review', 'review': review, 'ticket': review.ticket}
+        for review in user_reviews
+    ]
+
+    posts = sorted(
+        chain(tickets, reviews),
+        key=lambda post: post['review'].time_created if post['type'] == 'review' else post['ticket'].time_created,
+        reverse=True
+    )
+
+    context = {'posts': posts}
+
+    print(context)
+
+    return render(request, 'blog/posts.html', context)
 
 
 @login_required

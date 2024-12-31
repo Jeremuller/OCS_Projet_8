@@ -1,0 +1,11 @@
+{% load blog_extras %}
+
+<div class="stars">
+    {% for i in rating|range_filter %}
+        {% if i <= rating %}
+            <span class="star text-dark">&#9733;</span>  <!-- Étoile pleine -->
+        {% else %}
+            <span class="star text-muted">&#9734;</span>  <!-- Étoile vide -->
+        {% endif %}
+    {% endfor %}
+</div>
