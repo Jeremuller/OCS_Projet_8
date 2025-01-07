@@ -7,10 +7,10 @@
 <div class="ticket">
     <p>Ticket - {{ post.review.ticket.user }}</p>
     <p>{{ post.ticket.title }} - {{ post.ticket.author }}</p>
-    {% if post.ticket.image %}
+    {% if post.ticket.image and post.ticket.image.image %}
         <img src="{{ post.ticket.image.image.url }}" alt="Image associée au ticket" style="max-width: 200px;">
     {% endif %}
-    {% if not ticket.reviews.filter(user=request.user).exists %}
-        <a href="{% url 'create_review' ticket.id %}" class="btn btn-primary">Créer une critique</a>
+    {% if not post.already_reviewed %}
+        <a href="{% url 'create_review' post.ticket.id %}" class="btn btn-primary">Créer une critique</a>
     {% endif %}
 </div>

@@ -22,9 +22,23 @@ def home(request):
         Q(user=user) | Q(ticket__user=user) | Q(ticket__user__in=user.follows.all())
     ).select_related('ticket__image')
 
-    tickets = [{'type': 'ticket', 'ticket': ticket} for ticket in viewable_tickets]
+    reviewed_tickets_ids = set(
+        Review.objects.filter(user=user).values_list('ticket_id', flat=True)
+    )
+
+    tickets = [
+        {'type': 'ticket',
+         'ticket': ticket,
+         'already_reviewed': ticket.id in reviewed_tickets_ids
+         }
+        for ticket in viewable_tickets]
+
     reviews = [
-        {'type': 'review', 'review': review, 'ticket': review.ticket}
+        {'type': 'review',
+         'review': review,
+         'ticket': review.ticket,
+         'already_reviewed': review.ticket.id in reviewed_tickets_ids
+         }
         for review in viewable_reviews
     ]
 
@@ -35,8 +49,6 @@ def home(request):
     )
 
     context = {'posts': posts}
-
-    print(context)
 
     return render(request, 'blog/home.html', context)
 
@@ -99,14 +111,28 @@ def ticket_upload(request):
 def edit_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
     edit_form = forms.TicketForm(instance=ticket)
+    photo_form = forms.PhotoForm(instance=ticket.image if ticket.image else None)
     delete_form = forms.DeleteTicketForm()
 
     if request.method == 'POST':
         if 'edit_ticket' in request.POST:
-            edit_form = forms.TicketForm(request.POST,instance=ticket)
+            edit_form = forms.TicketForm(request.POST, instance=ticket)
+            photo_form = forms.PhotoForm(request.POST, request.FILES,
+                                         instance=ticket.photo if hasattr(ticket, 'photo') else None)
+
             if edit_form.is_valid():
-                edit_form.save()
+                ticket = edit_form.save()
+
+                photo = photo_form.save(commit=False)
+                photo.ticket = ticket
+                photo.uploader = request.user
+                photo.save()
+
+                ticket.image = photo
+                ticket.save()
+
                 return redirect('home')
+
         elif 'delete_ticket' in request.POST:
             delete_form = forms.DeleteTicketForm(request.POST)
             if delete_form.is_valid():
@@ -115,6 +141,7 @@ def edit_ticket(request, ticket_id):
 
     context = {
         'edit_form': edit_form,
+        'photo_form': photo_form,
         'delete_form': delete_form,
     }
     return render(request, 'blog/edit_ticket.html', context=context)
