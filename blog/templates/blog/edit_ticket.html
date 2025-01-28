@@ -5,16 +5,17 @@
         <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ edit_form.as_p }}
+            <!-- Miniature de l'image existante -->
+            {% if ticket.image and ticket.image.image %}
+                <div>
+                    <img src="{{ ticket.image.image.url }}" alt="Image associée au ticket" style="max-width: 200px;">
+                </div>
+            {% endif %}
             {{ photo_form.as_p }}
             <button type="submit">Modifier</button>
         </form>
         <hr>
-        <h3>Supprimer le ticket ?</h3>
-        <form method="post">
-            {% csrf_token %}
-            {{ delete_form }}
-            <button type="submit">Supprimer</button>
-        </form>
+
         <a href="{% url 'home' %}">Annuler</a>
     </div>
 {% endblock content %}

@@ -1,12 +1,20 @@
 <div class="ticket">
-    <p>{{ post.ticket.user }} a demandé une critique</p>
-    <p>Créé le : {{ post.ticket.time_created }}</p>
-    <p>{{ post.ticket.title }} - {{ post.ticket.author }}</p>
-    <p>{{ post.ticket.description }}</p>
-    {% if post.ticket.image and post.ticket.image.image %}
-        <img src="{{ post.ticket.image.image.url }}" alt="Image associée au ticket" style="max-width: 200px;">
-    {% endif %}
-    {% if not post.already_reviewed %}
-        <a href="{% url 'create_review' post.ticket.id %}" class="btn btn-primary">Créer une critique</a>
-    {% endif %}
+    {% with ticket|default:post.ticket as current_ticket %}
+        <p>
+            {% if current_ticket.user %}
+                {{ current_ticket.user }} a demandé une critique
+            {% endif %}
+        </p>
+        <p>Créé le : {{ current_ticket.time_created|date:"d/m/Y H:i" }}</p>
+        <p>{{ current_ticket.title }} - {{ current_ticket.author }}</p>
+        <p>{{ current_ticket.description }}</p>
+        {% if current_ticket.image and current_ticket.image.image %}
+            <img src="{{ current_ticket.image.image.url }}" alt="Image associée au ticket" style="max-width: 200px;">
+        {% endif %}
+
+        <!-- Bouton pour créer une critique si non encore critiqué -->
+        {% if not already_reviewed and not create_mode %}
+            <a href="{% url 'create_review' current_ticket.id %}" class="btn btn-primary">Créer une critique</a>
+        {% endif %}
+    {% endwith %}
 </div>

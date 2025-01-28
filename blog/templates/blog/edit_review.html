@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 {% block content %}
+    <div class="container">
+        <h2>Vous êtes en train de poster en réponse à:</h2>
+        {% include 'blog/partials/ticket_snippet.html' %}
+    </div>
     <h2>Modifier la critique</h2>
     <form method="post">
         {{ edit_form.as_p }}
@@ -7,11 +11,5 @@
         <button type="submit">Modifier</button>
     </form>
     <hr>
-    <h3>Supprimer la critique ?</h3>
-    <form method="post">
-        {{ delete_form }}
-        {% csrf_token %}
-        <button type="submit">Supprimer</button>
-    </form>
     <a href="{% url 'home' %}">Annuler</a>
 {% endblock content %}

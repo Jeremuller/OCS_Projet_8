@@ -1,10 +1,14 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Ajouter une critique</h2>
-<form method="post">
-    {{ review_form.as_p }}
-    {% csrf_token %}
-    <button type="submit">Publier</button>
-</form>
+<h2>Créer une critique</h2>
+    <h3>Vous êtes en train de poster en réponse à</h3>
+    {% include 'blog/partials/ticket_snippet.html' with ticket=ticket %}
+
+    <h3>Critique</h3>
+    <form method="post">
+        {{ review_form.as_p }}
+        {% csrf_token %}
+        <button type="submit">Publier</button>
+    </form>
 <a href="{% url 'home' %}">Retour à l'accueil</a>
 {% endblock content%}

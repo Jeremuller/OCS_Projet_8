@@ -74,8 +74,6 @@ def user_posts(request):
 
     context = {'posts': posts}
 
-    print(context)
-
     return render(request, 'blog/posts.html', context)
 
 
@@ -112,39 +110,42 @@ def edit_ticket(request, ticket_id):
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
     edit_form = forms.TicketForm(instance=ticket)
     photo_form = forms.PhotoForm(instance=ticket.image if ticket.image else None)
-    delete_form = forms.DeleteTicketForm()
 
     if request.method == 'POST':
-        if 'edit_ticket' in request.POST:
-            edit_form = forms.TicketForm(request.POST, instance=ticket)
-            photo_form = forms.PhotoForm(request.POST, request.FILES,
-                                         instance=ticket.photo if hasattr(ticket, 'photo') else None)
 
-            if edit_form.is_valid():
-                ticket = edit_form.save()
+        edit_form = forms.TicketForm(request.POST, instance=ticket)
+        photo_form = forms.PhotoForm(request.POST, request.FILES,
+                                     instance=ticket.photo if hasattr(ticket, 'photo') else None)
 
-                photo = photo_form.save(commit=False)
-                photo.ticket = ticket
-                photo.uploader = request.user
-                photo.save()
+        if edit_form.is_valid():
+            ticket = edit_form.save()
 
-                ticket.image = photo
-                ticket.save()
+            photo = photo_form.save(commit=False)
+            photo.ticket = ticket
+            photo.uploader = request.user
+            photo.save()
 
-                return redirect('home')
+            ticket.image = photo
+            ticket.save()
 
-        elif 'delete_ticket' in request.POST:
-            delete_form = forms.DeleteTicketForm(request.POST)
-            if delete_form.is_valid():
-                ticket.delete()
-                return redirect('home')
+            return redirect('home')
 
     context = {
         'edit_form': edit_form,
         'photo_form': photo_form,
-        'delete_form': delete_form,
+        'ticket': ticket,
     }
     return render(request, 'blog/edit_ticket.html', context=context)
+
+
+@login_required
+def delete_ticket(request, ticket_id):
+
+    ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
+
+    if request.method == 'POST':
+        ticket.delete()
+        return redirect('home')
 
 
 @login_required
@@ -172,25 +173,27 @@ def review_upload(request, ticket_id):
 def edit_review(request, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
     edit_form = forms.ReviewForm(instance=review)
-    delete_form = forms.DeleteReviewForm()
 
     if request.method == 'POST':
-        if 'edit_review' in request.POST:
-            edit_form = forms.ReviewForm(request.POST,instance=review)
-            if edit_form.is_valid():
-                edit_form.save()
-                return redirect('home')
-        elif 'delete_review' in request.POST:
-            delete_form = forms.DeleteReviewForm(request.POST)
-            if delete_form.is_valid():
-                review.delete()
-                return redirect('home')
+        edit_form = forms.ReviewForm(request.POST,instance=review)
+        if edit_form.is_valid():
+            edit_form.save()
+            return redirect('home')
 
     context = {
         'edit_form': edit_form,
-        'delete_form': delete_form,
+        'review': review
     }
     return render(request, 'blog/edit_review.html', context=context)
+
+
+@login_required
+def delete_review(request, review_id):
+    review = get_object_or_404(Review, id=review_id, user=request.user)
+
+    if request.method == 'POST':
+        review.delete()
+        return redirect('home')
 
 
 @login_required
