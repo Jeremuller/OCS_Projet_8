@@ -9,7 +9,7 @@
     {% for post in posts %}
         {% if post.type == 'review' %}
             <!-- Affichage pour une critique -->
-            {% include 'blog/partials/review_snippet.html' %}
+            {% include 'blog/partials/review_snippet.html' with review=post.review %}
             <div class = "container">
                 <a href="{% url 'edit_review' post.review.id %}" class="btn btn-outline-dark">Modifier</a>
                 <form action="{% url 'delete_review' post.review.id %}" method="post" style="display: inline;">
@@ -19,10 +19,7 @@
             </div>
         {% elif post.type == 'ticket' %}
             <!-- Affichage pour un ticket -->
-            {% include 'blog/partials/ticket_snippet.html' with post=post %}
-            {% if not ticket|is_ticket_already_reviewed:user %}
-                <a href="{% url 'create_review' post.ticket.id %}" class="btn btn-primary">Créer une critique</a>
-            {% endif %}
+            {% include 'blog/partials/ticket_snippet.html' with ticket=post.ticket %}
             <div class = "container">
                 <a href="{% url 'edit_ticket' post.ticket.id %}" class="btn btn-outline-dark">Modifier</a>
                 <form action="{% url 'delete_ticket' post.ticket.id %}" method="post" style="display: inline;">

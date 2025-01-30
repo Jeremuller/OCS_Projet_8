@@ -22,22 +22,16 @@ def home(request):
         Q(user=user) | Q(ticket__user=user) | Q(ticket__user__in=user.follows.all())
     ).select_related('ticket__image')
 
-    reviewed_tickets_ids = set(
-        Review.objects.filter(user=user).values_list('ticket_id', flat=True)
-    )
-
     tickets = [
         {'type': 'ticket',
-         'ticket': ticket,
-         'already_reviewed': ticket.id in reviewed_tickets_ids
+         'ticket': ticket
          }
         for ticket in viewable_tickets]
 
     reviews = [
         {'type': 'review',
          'review': review,
-         'ticket': review.ticket,
-         'already_reviewed': review.ticket.id in reviewed_tickets_ids
+         'ticket': review.ticket
          }
         for review in viewable_reviews
     ]
@@ -81,6 +75,8 @@ def user_posts(request):
 def ticket_upload(request):
     ticket_form = forms.TicketForm
     photo_form = forms.PhotoForm
+    ticket = None
+
     if request.method == 'POST':
         ticket_form = forms.TicketForm(request.POST)
         photo_form = forms.PhotoForm(request.POST, request.FILES)
@@ -94,11 +90,13 @@ def ticket_upload(request):
                 ticket.image = photo
 
             ticket.save()
+            print(f"Ticket ID: {ticket.id}")
             messages.success(request, "Votre ticket a été créé avec succès !")
             return redirect('home')
         else:
             ticket_form = forms.TicketForm()
     context = {
+        'ticket': ticket,
         'ticket_form': ticket_form,
         'photo_form': photo_form,
     }
@@ -173,6 +171,7 @@ def review_upload(request, ticket_id):
 def edit_review(request, review_id):
     review = get_object_or_404(Review, id=review_id, user=request.user)
     edit_form = forms.ReviewForm(instance=review)
+    ticket = review.ticket
 
     if request.method == 'POST':
         edit_form = forms.ReviewForm(request.POST,instance=review)
@@ -182,7 +181,8 @@ def edit_review(request, review_id):
 
     context = {
         'edit_form': edit_form,
-        'review': review
+        'review': review,
+        'ticket': ticket
     }
     return render(request, 'blog/edit_review.html', context=context)
 

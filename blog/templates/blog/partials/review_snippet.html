@@ -1,16 +1,11 @@
+{% load blog_extras %}
+
 <div class="review">
     <p>{{ post.review.user }} a publié une critique</p>
     <p>Posté le : {{ post.review.time_created }}</p>
     <p>{{ post.review.headline }} - {% include 'blog/partials/star_rating.html' with rating=post.review.rating %}</p>
     <p>{{ post.review.body }}</p>
 </div>
-<div class="ticket">
-    <p>Ticket - {{ post.review.ticket.user }}</p>
-    <p>{{ post.ticket.title }} - {{ post.ticket.author }}</p>
-    {% if post.ticket.image and post.ticket.image.image %}
-        <img src="{{ post.ticket.image.image.url }}" alt="Image associée au ticket" style="max-width: 200px;">
-    {% endif %}
-    {% if not post.already_reviewed %}
-        <a href="{% url 'create_review' post.ticket.id %}" class="btn btn-primary">Créer une critique</a>
-    {% endif %}
-</div>
+
+<!-- Inclusion du ticket correspondant -->
+{% include 'blog/partials/ticket_snippet.html' with ticket=post.review.ticket %}

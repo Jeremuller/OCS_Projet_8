@@ -16,13 +16,14 @@ def range_filter(value):
     return range(1, value + 1)
 
 
-@register.filter
-def is_ticket_already_reviewed(ticket, user):
+@register.simple_tag(takes_context=True)
+def is_ticket_already_reviewed(context, ticket):
 
     """
         Vérifie si un utilisateur a déjà rédigé une critique pour un ticket donné.
         Renvoie True si une critique existe, sinon False.
 
     """
+    user = context['user']
 
     return Review.objects.filter(ticket=ticket, user=user).exists()
