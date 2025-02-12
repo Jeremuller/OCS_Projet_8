@@ -7,7 +7,7 @@ class TicketForm(forms.ModelForm):
 
     class Meta:
         model = models.Ticket
-        fields = ['title', 'author', 'description']
+        fields = ["title", "author", "description"]
 
 
 class DeleteTicketForm(forms.Form):
@@ -19,16 +19,16 @@ class ReviewForm(forms.ModelForm):
 
     class Meta:
         model = models.Review
-        fields = ['headline', 'rating', 'body']
+        fields = ["headline", "rating", "body"]
         labels = {
-            'headline': 'Titre',
-            'body': 'Commentaire',
+            "headline": "Titre",
+            "body": "Commentaire",
         }
 
     rating = forms.ChoiceField(
         choices=[(i, "- " + str(i)) for i in range(6)],
-        widget=forms.RadioSelect(attrs={'class': 'inline-radio'}),
-        label="Note"
+        widget=forms.RadioSelect(attrs={"class": "inline-radio"}),
+        label="Note",
     )
 
 
@@ -39,8 +39,4 @@ class DeleteReviewForm(forms.Form):
 class PhotoForm(forms.ModelForm):
     class Meta:
         model = models.Photo
-        fields = ['image']
-
-
-
-    
+        fields = ["image"]

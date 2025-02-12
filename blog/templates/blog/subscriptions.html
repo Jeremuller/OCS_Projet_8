@@ -1,52 +1,49 @@
-{% extends 'base.html' %}
+{% extends 'base.html' %} {% block content %}
+<div class="container text-center my-5 mx-5">
+  <h2>Suivre d'autres utilisateurs</h2>
 
-{% block content %}
-    <div class="container text-center my-5 mx-5">
-        <h2>Suivre d'autres utilisateurs</h2>
+  <!-- Formulaire pour suivre un utilisateur -->
+  <form method="post" action="{% url 'follow_user' %}">
+    {% csrf_token %} {{ form.username }}
+    <button class="btn btn-outline-dark" type="submit">Envoyer</button>
+  </form>
 
-        <!-- Formulaire pour suivre un utilisateur -->
-        <form method="post" action="{% url 'follow_user' %}">
+  <!-- Liste des utilisateurs suivis -->
+  <h2>Abonnements</h2>
+  <table class="table table-striped border">
+    <tbody>
+      {% for user in following %}
+      <tr>
+        <td class="border">{{ user.username }}</td>
+        <td>
+          <form method="post" action="{% url 'unfollow_user' user.id %}">
             {% csrf_token %}
-            {{ form.username }}
-            <button class="btn btn-outline-dark" type="submit">Envoyer</button>
-        </form>
+            <button class="btn" type="submit">Se désabonner</button>
+          </form>
+        </td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td>Vous ne suivez personne.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
 
-        <!-- Liste des utilisateurs suivis -->
-        <h2>Abonnements</h2>
-        <table class="table table-striped border">
-            <tbody>
-                {% for user in following %}
-                    <tr>
-                        <td class="border">{{ user.username }}</td>
-                        <td>
-                            <form method="post" action="{% url 'unfollow_user' user.id %}">
-                                {% csrf_token %}
-                                <button class="btn" type="submit">Se désabonner</button>
-                            </form>
-                        </td>
-                    </tr>
-                {% empty %}
-                    <tr>
-                        <td>Vous ne suivez personne.</td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
-        <!-- Liste des abonnés -->
-        <h2>Abonnés</h2>
-            <table class="table table-striped border">
-                <tbody>
-                    {% for user in followers %}
-                        <tr>
-                            <td>{{ user.username }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr>
-                            <td>Personne ne vous suit encore.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-    </div>
+  <!-- Liste des abonnés -->
+  <h2>Abonnés</h2>
+  <table class="table table-striped border">
+    <tbody>
+      {% for user in followers %}
+      <tr>
+        <td>{{ user.username }}</td>
+      </tr>
+      {% empty %}
+      <tr>
+        <td>Personne ne vous suit encore.</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
 {% endblock %}

@@ -1,20 +1,20 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2>Créer une critique</h2>
-    <div class="container mx-3">
-        <h3>Vous êtes en train de poster en réponse à</h3>
-        {% include 'blog/partials/ticket_snippet.html' with ticket=ticket %}
-    </div>
-    <hr>
-    <div class="container mx-3">
-        <h3>Critique</h3>
-        <form method="post">
-            {{ review_form.as_p }}
-            {% csrf_token %}
-            <div class="text-end mx-5 mt-3">
-                <button type="submit">Envoyer</button>
-            </div>
-        </form>
-    </div>
+<div class="container mx-3">
+    <h3>Vous êtes en train de poster en réponse à</h3>
+    {% include 'blog/partials/ticket_snippet.html' with ticket=ticket %}
+</div>
+<hr>
+<div class="container mx-3">
+    <h3>Critique</h3>
+    <form method="post">
+        {{ review_form.as_p }}
+        {% csrf_token %}
+        <div class="text-end mx-5 mt-3">
+            <button type="submit">Envoyer</button>
+        </div>
+    </form>
+</div>
 <a href="{% url 'home' %}">Retour à l'accueil</a>
 {% endblock %}
