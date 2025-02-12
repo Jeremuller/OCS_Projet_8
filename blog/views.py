@@ -11,17 +11,28 @@ from django.db.models import Q
 
 @login_required
 def home(request):
+    """
+    Displays the home page with tickets and reviews of the current user
+    and the users they follow. Posts are sorted by creation time (newest first).
+
+    Context:
+        posts (list): A combined list of tickets and reviews sorted by their
+                      creation time.
+    """
 
     user = request.user
 
+    # Fetch tickets the user or users they follow have created
     viewable_tickets = Ticket.objects.filter(
         Q(user=user) | Q(user__in=user.follows.all())
     ).select_related("image")
 
+    # Fetch reviews written by the user or about tickets of the user or their followed users
     viewable_reviews = Review.objects.filter(
         Q(user=user) | Q(ticket__user=user) | Q(ticket__user__in=user.follows.all())
     ).select_related("ticket__image")
 
+    # Combine tickets and reviews into one list of posts
     tickets = [{"type": "ticket", "ticket": ticket} for ticket in viewable_tickets]
 
     reviews = [
@@ -29,6 +40,7 @@ def home(request):
         for review in viewable_reviews
     ]
 
+    # Sort the posts by their creation time (most recent first)
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: (
@@ -46,17 +58,26 @@ def home(request):
 
 @login_required
 def user_posts(request):
+    """
+    Displays posts (tickets and reviews) created by the logged-in user.
 
+    Context:
+        posts (list): A combined list of tickets and reviews created by the user.
+    """
+
+    # Fetch the user's tickets and reviews
     user_tickets = request.user.ticket_set.all().select_related("image")
 
     user_reviews = request.user.review_set.select_related("ticket__image")
 
+    # Combine the tickets and reviews into a list of posts
     tickets = [{"type": "ticket", "ticket": ticket} for ticket in user_tickets]
     reviews = [
         {"type": "review", "review": review, "ticket": review.ticket}
         for review in user_reviews
     ]
 
+    # Sort the posts by their creation time (most recent first)
     posts = sorted(
         chain(tickets, reviews),
         key=lambda post: (
@@ -74,6 +95,14 @@ def user_posts(request):
 
 @login_required
 def ticket_upload(request):
+    """
+    Allows a user to upload a new ticket, including an image (optional).
+
+    Context:
+        ticket (Ticket): The newly created ticket.
+        ticket_form (Form): The form for submitting a new ticket.
+        photo_form (Form): The form for uploading an image.
+    """
     ticket_form = forms.TicketForm
     photo_form = forms.PhotoForm
     ticket = None
@@ -106,6 +135,14 @@ def ticket_upload(request):
 
 @login_required
 def edit_ticket(request, ticket_id):
+    """
+    Allows a user to edit an existing ticket, including updating its image.
+
+    Context:
+        edit_form (Form): The form for editing the ticket.
+        photo_form (Form): The form for editing the ticket's image.
+        ticket (Ticket): The ticket being edited.
+    """
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
     edit_form = forms.TicketForm(instance=ticket)
     photo_form = forms.PhotoForm(instance=ticket.image if ticket.image else None)
@@ -142,6 +179,12 @@ def edit_ticket(request, ticket_id):
 
 @login_required
 def delete_ticket(request, ticket_id):
+    """
+    Deletes an existing ticket.
+
+    Context:
+        ticket (Ticket): The ticket to be deleted.
+    """
 
     ticket = get_object_or_404(Ticket, id=ticket_id, user=request.user)
 
@@ -152,6 +195,13 @@ def delete_ticket(request, ticket_id):
 
 @login_required
 def review_upload(request, ticket_id):
+    """
+    Allows a user to upload a review for a specific ticket.
+
+    Context:
+        review_form (Form): The form for submitting the review.
+        ticket (Ticket): The ticket being reviewed.
+    """
     ticket = get_object_or_404(Ticket, id=ticket_id)
     if request.method == "POST":
         review_form = forms.ReviewForm(request.POST)
@@ -174,6 +224,15 @@ def review_upload(request, ticket_id):
 
 @login_required
 def edit_review(request, review_id):
+    """
+    Allows a user to edit an existing review.
+
+    Context:
+        edit_form (Form): The form for editing the review.
+        review (Review): The review being edited.
+        ticket (Ticket): The ticket associated with the review.
+    """
+
     review = get_object_or_404(Review, id=review_id, user=request.user)
     edit_form = forms.ReviewForm(instance=review)
     ticket = review.ticket
@@ -195,6 +254,13 @@ def edit_review(request, review_id):
 
 @login_required
 def delete_review(request, review_id):
+    """
+    Deletes an existing review.
+
+    Context:
+        review (Review): The review to be deleted.
+    """
+
     review = get_object_or_404(Review, id=review_id, user=request.user)
 
     if request.method == "POST":
@@ -204,6 +270,15 @@ def delete_review(request, review_id):
 
 @login_required
 def create_ticket_review(request):
+    """
+    Allows a user to create both a ticket and a review at the same time.
+
+    Context:
+        ticket_form (Form): The form for submitting the ticket.
+        photo_form (Form): The form for uploading the image for the ticket.
+        review_form (Form): The form for submitting the review.
+    """
+
     ticket_form = forms.TicketForm
     photo_form = forms.PhotoForm
     review_form = forms.ReviewForm
@@ -244,6 +319,15 @@ def create_ticket_review(request):
 
 @login_required
 def follow_user(request):
+    """
+    Allows a user to follow another user.
+
+    Context:
+        form (Form): The form for selecting a user to follow.
+        followed_users (QuerySet): The list of users the current user is following.
+        followers (QuerySet): The list of followers of the current user.
+    """
+
     form = FollowUsersForm(request.POST, request_user=request.user)
 
     if request.method == "POST":
@@ -265,6 +349,13 @@ def follow_user(request):
 
 @login_required
 def unfollow_user(request, user_id):
+    """
+    Allows a user to unfollow another user.
+
+    Context:
+        user_to_unfollow (User): The user to be unfollowed.
+    """
+
     user_to_unfollow = User.objects.get(id=user_id)
 
     if user_to_unfollow in request.user.follows.all():
@@ -280,6 +371,15 @@ def unfollow_user(request, user_id):
 
 @login_required
 def subscriptions(request):
+    """
+    Displays a list of users the current user follows and who follows them.
+
+    Context:
+        following (QuerySet): The list of users the current user is following.
+        followers (QuerySet): The list of users following the current user.
+        form (Form): The form to follow other users.
+    """
+
     following = request.user.follows.all()
     followers = request.user.followers.all()
     form = FollowUsersForm(request.POST, request_user=request.user)
