@@ -12,6 +12,7 @@
             <!-- Affichage pour une critique -->
             {% include 'blog/partials/review_snippet.html' with review=post.review %}
 
+
         {% elif post.type == 'ticket' %}
             <!-- Affichage pour un ticket -->
             {% include 'blog/partials/ticket_snippet.html' with ticket=post.ticket %}

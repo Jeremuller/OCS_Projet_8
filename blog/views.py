@@ -161,6 +161,7 @@ def review_upload(request, ticket_id):
     else:
         review_form = forms.ReviewForm()
     context = {
+        'creating_review': True,
         'review_form': review_form,
         'ticket': ticket,
     }
@@ -180,6 +181,7 @@ def edit_review(request, review_id):
             return redirect('home')
 
     context = {
+        'creating_review': True,
         'edit_form': edit_form,
         'review': review,
         'ticket': ticket

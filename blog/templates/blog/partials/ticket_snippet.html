@@ -23,7 +23,7 @@
         {% endif %}
 
         <!-- Bouton pour créer une critique si non encore critiqué -->
-        {% if not already_reviewed %}
+        {% if not already_reviewed and not creating_review %}
             <a href="{% url 'create_review' current_ticket.id %}" class="btn btn-primary">Créer une critique</a>
         {% endif %}
 

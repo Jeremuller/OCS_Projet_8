@@ -3,7 +3,7 @@
 {% block title %}Inscription{% endblock %}
 
 {% block content %}
-    <h1>Inscription</h1>
+    <h1 class="mb-3">Inscription</h1>
     <form method="post">
         {% csrf_token %}
         {{ form.as_p }}

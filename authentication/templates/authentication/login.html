@@ -5,11 +5,11 @@
 {% block content %}
     <div class="login container justify-content-center align-items-center row">
         <div class="container col-6 text-center">
-        <h1>Inscriver-vous maintenant</h1>
+        <h2 class="mb-3">Inscriver-vous maintenant</h2>
             <a href="{% url 'signup' %}" class="btn btn-outline-dark">S'inscrire</a>
         </div>
         <div class="container col-6 text-center">
-        <h1>Connectez-vous</h1>
+        <h2 class="mb-3">Connectez-vous</h2>
             <form method="post">
                 {% csrf_token %}
                 <div class="form-group mb-3">

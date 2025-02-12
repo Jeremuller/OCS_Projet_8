@@ -1,0 +1,18 @@
+.container {
+    max-width: 90%;
+    margin: auto;
+}
+
+.helptext {
+    display: none;
+}
+input:focus + .helptext {
+    display: block;
+}
+
+form ul {
+    display: none;
+}
+input:focus ~ ul {
+    display: block;
+}

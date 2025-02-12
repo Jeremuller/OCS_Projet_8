@@ -19,12 +19,16 @@ class ReviewForm(forms.ModelForm):
 
     class Meta:
         model = models.Review
-        fields = ['rating', 'headline', 'body']
+        fields = ['headline', 'rating', 'body']
+        labels = {
+            'headline': 'Titre',
+            'body': 'Commentaire',
+        }
 
     rating = forms.ChoiceField(
-        choices=[(i, str(i)) for i in range(6)],
-        widget=forms.RadioSelect,
-        label="Note",
+        choices=[(i, "- " + str(i)) for i in range(6)],
+        widget=forms.RadioSelect(attrs={'class': 'inline-radio'}),
+        label="Note"
     )
 
 
